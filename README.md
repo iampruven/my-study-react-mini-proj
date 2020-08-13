@@ -12,3 +12,5 @@
     * toggle on off button
 * Select and Move
     * select from one category and move to the other category and vice versa
+* Phone Book
+    * keep track of a person and their phone number
