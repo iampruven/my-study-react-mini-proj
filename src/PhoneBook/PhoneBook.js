@@ -8,9 +8,10 @@ export default class PhoneBook extends React.Component {
     ],
     newName: "",
     newPhone: "",
-    editName: "jull2",
+    editName: "",
     editPhone: "",
-    editMode: false,
+    editNameMode: false,
+    editPhoneMode: false,
   };
 
   updateName(name) {
@@ -19,37 +20,56 @@ export default class PhoneBook extends React.Component {
   updatePhone(phone) {
     this.setState({ newPhone: phone });
   }
-  updateEditMode = (id) => {
+  updateEditNameMode = (id) => {
     let existingName = this.state.contact.filter((x) => x.id === id)[0].name;
-    this.setState({ editMode: id, editName: existingName });
+    // let existingPhone = this.state.contact.filter((x) => x.id === id)[0].phone;
+    this.setState({ editNameMode: id, editName: existingName });
   };
   handleEditName = (newerName) => {
     this.setState({ editName: newerName });
+  };
+  handleEditPhone(newPhone) {
+    this.setState({ editPhone: newPhone });
+  }
+
+  updateEditPhoneMode = (id) => {
+    let existingPhone = this.state.contact.filter((x) => x.id === id)[0].phone;
+    this.setState({ editPhoneMode: id, editPhone: existingPhone });
   };
   handleSaveName = () => {
     // {...contact, name: this.state.editName}
     // take everything but change the name only
     let saveName = this.state.contact.map((contact) => {
-      return contact.id === this.state.editMode
+      return contact.id === this.state.editNameMode
         ? { ...contact, name: this.state.editName }
         : contact;
     });
     this.setState({
       contact: saveName,
-      editMode: false,
+      editNameMode: false,
     });
   };
+  handleSavePhone = () => {
+    let savePhone = this.state.contact.map((contact) => {
+      return contact.id === this.state.editPhoneMode
+        ? { ...contact, phone: this.state.editPhone }
+        : contact;
+    });
+    this.setState({contact:savePhone, editPhoneMode:false})
+  };
+  handleDeleteContact = (id) => {
+    let newContact = this.state.contact.filter((contact) => {
+      return contact.id !== id;
+    });
+    this.setState({ contact: newContact });
+  };
 
-  handleDeleteContact=(id)=>{
-    let newContact=this.state.contact.filter(contact=>{
-      return contact.id !== id
-    })
-    this.setState({contact:newContact})
-  }
-
-  handleCancelEdit=()=>{
-    this.setState({editMode:false})
-  }
+  handleNameCancelEdit = () => {
+    this.setState({ editNameMode: false });
+  };
+  handlePhoneCancelEdit = () => {
+    this.setState({ editPhoneMode: false });
+  };
   onSubmitInfo(ev) {
     ev.preventDefault();
 
@@ -65,23 +85,42 @@ export default class PhoneBook extends React.Component {
     const book = this.state.contact.map((x, id) => {
       return (
         <li key={id}>
-          {this.state.editMode === x.id ? (
+          {this.state.editNameMode === x.id ? (
             <div>
               <input
                 id="person-name"
                 type="text"
+                required
                 value={this.state.editName}
                 onChange={(e) => this.handleEditName(e.target.value)}
               />
               <button onClick={this.handleSaveName}>Save</button>
-              <button onClick={this.handleCancelEdit}>Cancel</button>
+              <button onClick={this.handleNameCancelEdit}>Cancel</button>
             </div>
           ) : (
-              <span onClick={() => this.updateEditMode(x.id)}>{x.name}</span>             
-          )}{" "}  
-            <span onClick={() => this.updateEditMode(x.id)}>{x.phone}</span>
-            <button onClick={()=>this.handleDeleteContact(x.id)}>Delete</button>
-          
+            <span onClick={() => this.updateEditNameMode(x.id)}>{x.name}</span>
+          )}{" "}
+          {this.state.editPhoneMode === x.id ? (
+            <div>
+              <input
+                id="contact-number"
+                type="tel"
+                pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+                placeholder="123-456-7890"
+                required
+                name="contact-number"
+                value={this.state.editPhone}
+                onChange={(e) => this.handleEditPhone(e.target.value)}
+              />
+              <button onClick={this.handleSavePhone}>Save</button>
+              <button onClick={this.handlePhoneCancelEdit}>Cancel</button>
+            </div>
+          ) : (
+            <span onClick={() => this.updateEditPhoneMode(x.id)}>
+              {x.phone}
+            </span>
+          )}
+          <button onClick={() => this.handleDeleteContact(x.id)}>Delete</button>
         </li>
       );
       //onClick takes in a function
