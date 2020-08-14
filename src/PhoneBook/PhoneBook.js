@@ -3,17 +3,52 @@ import "./PhoneBook.css";
 export default class PhoneBook extends React.Component {
   state = {
     contact: [
-      { name: "Jill", phone: "(408)-550-5522" },
-      { name: "Capibara-san", phone: "123-000-1234" },
+      { id: 1, name: "Jill", phone: "(408)-550-5522" },
+      { id: 2, name: "Capibara-san", phone: "123-000-1234" },
     ],
     newName: "",
     newPhone: "",
+    editName: "jull2",
+    editPhone: "",
+    editMode: false,
   };
+
   updateName(name) {
     this.setState({ newName: name });
   }
   updatePhone(phone) {
     this.setState({ newPhone: phone });
+  }
+  updateEditMode = (id) => {
+    let existingName = this.state.contact.filter((x) => x.id === id)[0].name;
+    this.setState({ editMode: id, editName: existingName });
+  };
+  handleEditName = (newerName) => {
+    this.setState({ editName: newerName });
+  };
+  handleSaveName = () => {
+    // {...contact, name: this.state.editName}
+    // take everything but change the name only
+    let saveName = this.state.contact.map((contact) => {
+      return contact.id === this.state.editMode
+        ? { ...contact, name: this.state.editName }
+        : contact;
+    });
+    this.setState({
+      contact: saveName,
+      editMode: false,
+    });
+  };
+
+  handleDeleteContact=(id)=>{
+    let newContact=this.state.contact.filter(contact=>{
+      return contact.id !== id
+    })
+    this.setState({contact:newContact})
+  }
+
+  handleCancelEdit=()=>{
+    this.setState({editMode:false})
   }
   onSubmitInfo(ev) {
     ev.preventDefault();
@@ -24,13 +59,32 @@ export default class PhoneBook extends React.Component {
     });
     this.setState({ contact: newContact });
   }
+
   render() {
+    console.log(this.state.editMode);
     const book = this.state.contact.map((x, id) => {
       return (
         <li key={id}>
-          {x.name} {x.phone}
+          {this.state.editMode === x.id ? (
+            <div>
+              <input
+                id="person-name"
+                type="text"
+                value={this.state.editName}
+                onChange={(e) => this.handleEditName(e.target.value)}
+              />
+              <button onClick={this.handleSaveName}>Save</button>
+              <button onClick={this.handleCancelEdit}>Cancel</button>
+            </div>
+          ) : (
+              <span onClick={() => this.updateEditMode(x.id)}>{x.name}</span>             
+          )}{" "}  
+            <span onClick={() => this.updateEditMode(x.id)}>{x.phone}</span>
+            <button onClick={()=>this.handleDeleteContact(x.id)}>Delete</button>
+          
         </li>
       );
+      //onClick takes in a function
     });
     return (
       <section>
