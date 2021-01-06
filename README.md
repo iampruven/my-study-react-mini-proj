@@ -15,3 +15,5 @@
 * Phone Book
     * keep track of a person and their phone number
     * add, edit, save, cancel, or delete a contact info
+* Tic Tac Toe
+    * X and O get 3 in a row to win
